@@ -1,0 +1,32 @@
+{
+  // rc-qa-gate — sys-firewall. Token broker, call-log resolve, retry ladder, redaction, D1
+  // writes, the alert POLICY, and SMS dispatch. Queue consumer + cron (subscription renewal)
+  // + a small admin/health face. No hostname. HO-RCQA-001 D1/D2/D5/D6. fabricated:false
+  "name": "rc-qa-gate",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "vars": {
+    "RC_SERVER": "https://platform.ringcentral.com",
+    "HOOK_ADDRESS": "https://rc-qa.example.com/hook",
+    "STORE_CODE": "STOREA",
+    "APEX_STATE_URL": "https://<your-state-worker>.workers.dev/state/apex:smbos",
+    // SMS goes out only when this is "1" OR the apex switchboard arms ringcentral + write_ops + prod
+    // with the dial at ASSISTED or above. Until then alerts are DRAFTED into D1, never sent.
+    "SMS_LIVE": "0",
+    // STORE_MAP — which main line answers which dialed number, each agent extension's majority store, and the shared lines that fold into Unassigned (rule 4). The values below are an EXAMPLE; measure yours from the call log and re-measure when a line or a hire changes.
+    "STORE_MAP": "{\"store_of_number\": {\"+15550100001\": \"STOREA\", \"+15550100002\": \"STOREB\"}, \"extension_store\": {\"1001\": \"STOREA\", \"1002\": \"STOREA\", \"1003\": \"STOREA\", \"1004\": \"STOREA\", \"2001\": \"STOREB\", \"2002\": \"STOREB\", \"2003\": \"STOREB\", \"2004\": \"STOREB\"}, \"shared_extensions\": {\"1000\": \"Store A main line\", \"2000\": \"Store B main line\", \"1010\": \"Store A sales desk\", \"3000\": \"Back office phone\"}, \"measured\": \"EXAMPLE \\u2014 measure yours from the call log: which main line answers which dialed number, each agent extension's majority store, and the shared lines that fold into Unassigned (rule 4). Re-measure when a line or a hire changes.\"}"
+  },
+  "kv_namespaces": [ { "binding": "SEEN", "id": "<kv-namespace-id>" } ],
+  "d1_databases": [ { "binding": "DB", "database_name": "smbos_call_qa", "database_id": "<d1-database-id>" } ],
+  "services": [ { "binding": "INFER", "service": "rc-qa-infer" } ],
+  "queues": {
+    "consumers": [ { "queue": "rc-qa-jobs", "max_batch_size": 1, "max_batch_timeout": 5, "max_retries": 40, "max_concurrency": 2, "retry_delay": 120, "dead_letter_queue": "rc-qa-dlq" } ],
+    "producers": [ { "binding": "QA_QUEUE", "queue": "rc-qa-jobs" } ]
+  },
+  "triggers": { "crons": ["17 */6 * * *"] }
+  // secrets: RC_CLIENT_ID RC_CLIENT_SECRET RC_JWT RC_VALIDATION_TOKEN RC_SMS_FROM SHOP_MANAGER_PHONE ADMIN_TOKEN
+}

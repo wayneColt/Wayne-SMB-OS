@@ -1,0 +1,7 @@
+node_modules/
+target/
+.wrangler/
+__pycache__/
+*.bak*
+.env
+*.env

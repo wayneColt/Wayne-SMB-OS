@@ -1,0 +1,12 @@
+{
+  "rubric_version": "client-rubric-example",
+  "authority": "EXAMPLE of a client's intake rules. Replace with the client's own wording; the gate applies these rules in code (sys-firewall/rc-qa-gate/src/policy.js), never the model.",
+  "rules": {
+    "scheduled": "A call counts as Scheduled only when the intake outcome says an appointment was booked on the call.",
+    "lost": "A qualified caller who was not scheduled counts as Lost; record the reason from a fixed list (no next steps, will call back, pricing concerns, not qualified).",
+    "revenue": "Revenue is taken only from a real Value column supplied by the client; it is never estimated from the call.",
+    "unassigned": "A call answered by a shared line or a blank answerer is grouped as Unassigned, never credited to a person."
+  },
+  "kpi_base": "inbound calls only; outbound calls are graded for coaching and set aside",
+  "fabricated": false
+}

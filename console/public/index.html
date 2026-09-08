@@ -1,0 +1,1002 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>WOSP · Wayne OS Platform</title>
+<style>
+:root{
+  /* extends the SOTR plate palette — same product, front door register */
+  --bg:#05070a; --panel:#0a1016; --tile:#0e161e; --line:#182028; --line2:#22303a;
+  --ink:#d7e0ea; --dim:#6a7a88; --mute:#3d4c58;
+  --teal:#6cd6c6;   /* USE  · live */
+  --brass:#c4a05a;  /* WORK · lag / wait */
+  --kern:#4f8ef7;    /* DEPLOY · kernel, accept, the operator */
+  --drop:#e07070;   /* refused / no signal */
+  --ok:#2dd4a0;
+  --mono:"IBM Plex Mono","JetBrains Mono",ui-monospace,Menlo,monospace;
+  --serif:"Fraunces","Iowan Old Style",Georgia,serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:13px;line-height:1.5;min-height:100vh}
+a{color:var(--teal);text-decoration:none;border-bottom:1px solid rgba(108,214,198,.25)}
+a:hover{border-bottom-color:var(--teal)}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+button{font-family:inherit;font-size:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line2);padding:6px 8px;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--teal);outline:none}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ── masthead ─────────────────────────────────────────── */
+header{padding:20px 22px 14px;border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:baseline;flex-wrap:wrap}
+.mark{font-family:var(--serif);font-size:1.7rem;letter-spacing:.01em}
+.mark em{font-style:normal;color:var(--teal)}
+.origin{color:var(--mute);font-size:11px}
+.origin b{color:var(--dim);font-weight:400}
+.spacer{flex:1}
+.pill{font-size:10px;letter-spacing:.1em;border:1px solid var(--line2);padding:4px 8px;color:var(--dim);white-space:nowrap}
+.pill.on{color:var(--teal);border-color:rgba(108,214,198,.4)}
+.pill.wait{color:var(--brass);border-color:rgba(196,160,90,.4)}
+.pill.no{color:var(--drop);border-color:rgba(224,112,112,.4)}
+.pill.kernel{color:var(--kern);border-color:rgba(79,142,247,.4)}
+
+/* ── the spine (hero) ─────────────────────────────────── */
+.spine{padding:26px 22px 22px;border-bottom:1px solid var(--line);background:
+  radial-gradient(1100px 200px at 18% -40%, rgba(79,142,247,.07), transparent 70%)}
+.spine h1{font-family:var(--serif);font-weight:400;font-size:1.35rem;margin-bottom:4px}
+.spine .sub{color:var(--dim);font-size:12px;max-width:74ch;margin-bottom:20px}
+.spine .sub b{color:var(--ink);font-weight:500}
+.chain{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+.node{flex:1 1 190px;min-width:170px;border:1px solid var(--line2);border-right:none;padding:13px 14px;background:var(--tile);position:relative}
+.node:last-child{border-right:1px solid var(--line2)}
+.node .k{font-size:10px;letter-spacing:.14em;color:var(--mute)}
+.node .v{font-family:var(--serif);font-size:1.1rem;margin:5px 0 6px}
+.node .n{color:var(--dim);font-size:11px;line-height:1.45}
+.node.think{border-top:2px solid var(--teal)}
+.node.think .v{color:var(--teal)}
+.node.hand{border-top:2px solid var(--brass)}
+.node.hand .v{color:var(--brass)}
+.node.accept{border-top:2px solid var(--kern);background:linear-gradient(180deg,rgba(79,142,247,.08),transparent 60%),var(--tile)}
+.node.accept .v{color:var(--kern)}
+.node .st{position:absolute;top:11px;right:12px;font-size:9px;letter-spacing:.1em;color:var(--mute)}
+@media(max-width:820px){.node{border-right:1px solid var(--line2);border-bottom:none}
+  .node:last-child{border-bottom:1px solid var(--line2)}}
+.spinelaw{margin-top:14px;color:var(--brass);font-size:11px;border-left:2px solid rgba(196,160,90,.4);padding-left:11px}
+.spinelaw b{color:var(--ink);font-weight:500}
+
+/* ── lanes ────────────────────────────────────────────── */
+.lanebar{display:flex;border-bottom:1px solid var(--line);background:var(--panel);overflow-x:auto}
+.lanebar button{padding:13px 20px;border-bottom:2px solid transparent;color:var(--mute);white-space:nowrap;letter-spacing:.03em;transition:color .15s}
+.lanebar button:hover{color:var(--dim)}
+.lanebar button .t{font-family:var(--serif);font-size:1rem;display:block}
+.lanebar button .d{font-size:10px;letter-spacing:.08em;display:block;margin-top:2px}
+.lanebar button[aria-selected=true]{color:var(--ink)}
+.lanebar button[data-lane=use][aria-selected=true]{border-bottom-color:var(--teal)}
+.lanebar button[data-lane=work][aria-selected=true]{border-bottom-color:var(--brass)}
+.lanebar button[data-lane=deploy][aria-selected=true]{border-bottom-color:var(--kern)}
+
+main{padding:22px;max-width:1400px}
+.lane[hidden]{display:none}
+.grid2{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;align-items:start}
+@media(max-width:1000px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--tile);border:1px solid var(--line);padding:15px 16px;margin-bottom:16px}
+.card h2{font-family:var(--serif);font-weight:400;font-size:1.05rem;margin-bottom:3px}
+.card .lede{color:var(--dim);font-size:11.5px;margin-bottom:13px;max-width:72ch}
+.card.accentteal{border-left:2px solid var(--teal)}
+.card.accentbrass{border-left:2px solid var(--brass)}
+.card.accentbob{border-left:2px solid var(--kern)}
+
+.field{margin-bottom:11px}
+.field label{display:block;font-size:10px;letter-spacing:.1em;color:var(--mute);margin-bottom:4px}
+.field .hint{color:var(--mute);font-size:10.5px;margin-top:4px}
+.field .bool{display:inline-flex;gap:6px;align-items:center;margin:0 14px 6px 0;color:var(--dim);letter-spacing:0;text-transform:none;font-size:11.5px}
+.field .bool input{width:auto}
+.rowbtn{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px;align-items:center}
+.btn{border:1px solid var(--line2);padding:7px 13px;color:var(--dim);transition:all .15s}
+.btn:hover{color:var(--ink);border-color:var(--dim)}
+.btn.go{border-color:rgba(108,214,198,.45);color:var(--teal)}
+.btn.go:hover{background:rgba(108,214,198,.09)}
+.btn.esc{border-color:rgba(79,142,247,.45);color:var(--kern)}
+.btn.esc:hover{background:rgba(79,142,247,.09)}
+.btn[disabled]{opacity:.35;cursor:not-allowed}
+
+table{width:100%;border-collapse:collapse;font-size:11.5px}
+th{text-align:left;font-weight:400;color:var(--mute);font-size:10px;letter-spacing:.1em;padding:0 10px 7px 0;border-bottom:1px solid var(--line)}
+td{padding:8px 10px 8px 0;border-bottom:1px solid var(--line);color:var(--dim);vertical-align:top}
+td b{color:var(--ink);font-weight:500}
+tr:last-child td{border-bottom:none}
+code{color:var(--ink);background:rgba(255,255,255,.035);padding:1px 4px;font-size:11px}
+pre{white-space:pre-wrap;word-break:break-word;background:var(--bg);border:1px solid var(--line);padding:11px;font-size:11px;color:var(--dim);max-height:280px;overflow:auto;line-height:1.5}
+pre b{color:var(--ink);font-weight:400}
+.tag{font-size:9.5px;letter-spacing:.09em;border:1px solid var(--line2);padding:2px 6px;color:var(--mute);white-space:nowrap}
+.tag.live{color:var(--teal);border-color:rgba(108,214,198,.35)}
+.tag.lag{color:var(--brass);border-color:rgba(196,160,90,.35)}
+.tag.ref{color:var(--drop);border-color:rgba(224,112,112,.35)}
+.tag.kern{color:var(--kern);border-color:rgba(79,142,247,.35)}
+.tags{display:flex;gap:5px;flex-wrap:wrap}
+
+.appgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:11px}
+.app{border:1px solid var(--line2);padding:12px;background:var(--bg);text-align:left;width:100%;transition:border-color .15s}
+.app:hover{border-color:var(--dim)}
+.app[aria-pressed=true]{border-color:var(--teal);background:rgba(108,214,198,.05)}
+.app .nm{font-family:var(--serif);font-size:1.02rem;color:var(--ink)}
+.app .cu{font-size:10.5px;color:var(--mute);margin-top:2px}
+.app .kb{font-size:10.5px;color:var(--dim);margin-top:7px;line-height:1.45}
+
+.dial{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--line);font-size:11.5px;gap:12px}
+.dial:last-child{border-bottom:none}
+.dial .lb{color:var(--dim)}
+.dial .vl{color:var(--ink);text-align:right}
+.dial .vl small{color:var(--mute);display:block;font-size:10px}
+
+.apexrow{border:1px solid rgba(79,142,247,.3);background:linear-gradient(90deg,rgba(79,142,247,.07),transparent);padding:15px 16px;margin-bottom:16px}
+.apexrow h2{font-family:var(--serif);font-weight:400;font-size:1.05rem;color:var(--kern);margin-bottom:5px}
+.apexrow p{color:var(--dim);font-size:11.5px;max-width:76ch;margin-bottom:5px}
+
+footer{padding:14px 22px;border-top:1px solid var(--line);color:var(--mute);font-size:10px;display:flex;gap:18px;flex-wrap:wrap;margin-top:14px}
+.log{font-size:10.5px;color:var(--mute);white-space:pre-wrap;line-height:1.6}
+/* ═══ APEX — the three instruments ═══ */
+.apex{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:16px 18px;display:grid;gap:14px;margin-top:18px}
+.apex .hd{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.apex h2{margin:0;font:600 18px/1.2 var(--serif)}
+.apex .law{color:var(--dim);font-size:12px}
+.inst{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media (max-width:900px){.inst{grid-template-columns:1fr}}
+.ins{background:var(--tile);border:1px solid var(--line);border-radius:4px;padding:12px;display:grid;gap:8px;align-content:start}
+.ins h3{margin:0;font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.ins .ro{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:12px;color:var(--dim)}.ins .ro b{color:var(--ink);font-weight:500}
+.dialwrap input[type=range]{width:100%;accent-color:var(--brass)}
+.detents{display:flex;justify-content:space-between;font:500 10px/1 var(--mono);letter-spacing:.08em;color:var(--mute)}
+.dpos{font:500 28px/1 var(--mono);color:var(--brass)}
+.ring{width:100%;max-width:220px;justify-self:center}
+.ring .pin{fill:var(--line2);cursor:pointer}.ring .pin.out{fill:var(--teal)}.ring .pin.sel{stroke:var(--kern);stroke-width:2}
+.ring .hand{stroke:var(--drop);stroke-width:1.5}
+.pinform{display:grid;grid-template-columns:auto 1fr;gap:6px 8px;font-size:12px;color:var(--dim);align-items:center}
+.pinform input,.pinform select{font:inherit;background:var(--panel);color:var(--ink);border:1px solid var(--line2);border-radius:3px;padding:4px 6px;width:100%}
+.board{display:grid;gap:5px}
+.sw{display:grid;grid-template-columns:78px 1fr auto auto;align-items:center;gap:8px;font-size:12px;padding:4px 6px;border:1px solid var(--line);border-radius:3px}
+.sw .lever{font:500 11px/1 var(--mono);letter-spacing:.08em;padding:5px 7px;border-radius:3px;border:1px solid var(--line2);background:var(--panel);color:var(--dim);cursor:pointer;text-align:center}
+.sw .lever.on{color:var(--teal);border-color:var(--teal)}
+.sw .lamp{font-size:11px;color:var(--mute)}.sw .lamp.ok{color:var(--ok)}.sw .lamp.trip{color:var(--drop)}
+.sw .guard{font-size:10px;color:var(--brass);letter-spacing:.08em}
+.sw .rst{font:inherit;font-size:11px;background:transparent;color:var(--dim);border:1px solid var(--line2);border-radius:3px;padding:3px 6px;cursor:pointer}
+.apex button.set{font:inherit;font-size:12px;background:var(--panel);color:#cfe0ff;border:1px solid var(--kern);border-radius:3px;padding:6px 10px;cursor:pointer}
+.apex button:disabled{opacity:.45;cursor:not-allowed}
+.apex .st{font-size:12px;color:var(--dim);min-height:16px}
+.feed{display:flex;flex-direction:column;gap:6px;margin-top:8px}.feed .row{display:grid;grid-template-columns:52px 130px 110px 46px 1fr auto;gap:10px;align-items:baseline;font-size:12.5px;padding:6px 8px;border-left:2px solid var(--line,#444)}.feed .row.trip{border-left-color:#e54b3a}.feed .row.muted{opacity:.6}.feed .t,.feed .sc{font-family:var(--mono,monospace);font-size:11px}.feed .out.ok{color:#3cc46b}.feed .out.lost{color:#e5a63a}.feed .note{opacity:.85}.feed .al{font-family:var(--mono,monospace);font-size:10px;color:#e54b3a}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="mark">W<em>OSP</em></div>
+    <div class="origin">Wayne OS Platform · serving from <b id="origin">…</b> · door <b id="door">…</b></div>
+  </div>
+  <div class="spacer"></div>
+  <span class="pill" id="p-pane">pane …</span>
+  <span class="pill" id="p-ide">ide …</span>
+  <span class="pill" id="p-face">face …</span>
+  <span class="pill kernel" id="p-kern">kernel …</span>
+  <span class="pill wait" id="p-desk">desk …</span>
+  <span class="pill" id="p-who">who …</span>
+  <a class="pill" id="btn-out" href="/login" title="clear the session cookie">sign out</a>
+</header>
+
+<!-- ── HERO: the accept spine ───────────────────────── -->
+<section class="spine">
+  <h1>One platform, three subjects, one accept path.</h1>
+  <p class="sub">You have been deploying, working, and using as a single subject. They are separate lanes with separate authority. <b>Hands are activated after the thought</b> — the intelligence classifies, then names the hand. Only the Kernel disposes.</p>
+
+  <div class="chain">
+    <div class="node think">
+      <span class="st" id="s-intent">open</span>
+      <div class="k">1 · intent</div>
+      <div class="v">You</div>
+      <div class="n">Plain language. A knob turned, a question asked, a change wanted. No syntax required.</div>
+    </div>
+    <div class="node think">
+      <span class="st" id="s-oracle">ready</span>
+      <div class="k">2 · thought</div>
+      <div class="v">Oracle</div>
+      <div class="n">Classifies the lane, picks the level, names which hand acts. Routes. Never accepts.</div>
+    </div>
+    <div class="node hand">
+      <span class="st" id="s-hand">idle</span>
+      <div class="k">3 · hands</div>
+      <div class="v">Agents</div>
+      <div class="n">ClaudeCode · GrokBuild · Gemini · container exec. Assigned per application. Propose only.</div>
+    </div>
+    <div class="node accept">
+      <span class="st" id="s-kernel">A=LAG</span>
+      <div class="k">4 · accept</div>
+      <div class="v">Kernel</div>
+      <div class="n">aios_k0 on metal. The only accept path. Disposes to LAG or PUBLISH. Outside WOSP.</div>
+    </div>
+  </div>
+
+  <p class="spinelaw"><b>Schedule-free.</b> z live local · x R2 deployable · y ephemeral, no stored y · &amp;&amp; one snapshot: x and ledger together or neither. Propose only. WOSP has no kernel referent.</p>
+</section>
+
+<!-- ── LANES ─────────────────────────────────────────── -->
+<nav class="lanebar" role="tablist" aria-label="Platform lanes">
+  <button role="tab" id="tab-use" data-lane="use" aria-selected="true" aria-controls="lane-use" tabindex="0">
+    <span class="t">Use</span><span class="d">configure a running application</span></button>
+  <button role="tab" id="tab-work" data-lane="work" aria-selected="false" aria-controls="lane-work" tabindex="-1">
+    <span class="t">Work</span><span class="d">hands, containers, the room</span></button>
+  <button role="tab" id="tab-deploy" data-lane="deploy" aria-selected="false" aria-controls="lane-deploy" tabindex="-1">
+    <span class="t">Deploy</span><span class="d">kernel, decisions, the apex</span></button>
+</nav>
+
+<main>
+
+<!-- ══ USE ══════════════════════════════════════════ -->
+<div class="lane" id="lane-use" role="tabpanel" aria-labelledby="tab-use">
+  <div class="grid2">
+    <div>
+      <div class="card accentteal">
+        <h2>Applications</h2>
+        <p class="lede">A shipped instance plus knobs. You are configuring something that is already running — not building one.</p>
+        <div class="appgrid" id="apps"></div>
+      </div>
+
+      <div class="card accentteal">
+        <h2>Configure</h2>
+        <p class="lede" id="cfg-lede">Turn the knobs. The Oracle composes a proposal. The Kernel disposes it — a configure that reaches the Face returns <code>A=LAG</code> until metal accepts; one that cannot leave the browser returns <code>NO_SIGNAL</code>.</p>
+        <div id="knobs"></div>
+        <div class="rowbtn">
+          <button class="btn go" id="btn-propose">Send proposal</button>
+          <button class="btn" id="btn-curl">Copy as curl</button>
+          <span class="tag lag">returns A=LAG</span>
+        </div>
+        <pre id="cfg-out" style="margin-top:13px">No proposal composed yet.</pre>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>Ask the Oracle</h2>
+        <p class="lede">Say what you want in plain language. It tells you the lane, the level, and which hand would act.</p>
+        <div class="field">
+          <label for="oq">intent</label>
+          <textarea id="oq" rows="3" placeholder="e.g. show the client the Store A numbers for last period"></textarea>
+        </div>
+        <div class="rowbtn"><button class="btn go" id="btn-oracle">Classify</button></div>
+        <pre id="oracle-out" style="margin-top:13px">Waiting for an intent.</pre>
+      </div>
+
+      <div class="card">
+        <h2>Live instruments</h2>
+        <p class="lede">Probed from this page on load. Nothing here is inherited from a document. A browser block is reported as a browser block, not as a dead organ.</p>
+        <pre class="log" id="probelog">probing…</pre>
+        <div class="rowbtn"><button class="btn" id="btn-reprobe">Re-probe</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ WORK ═════════════════════════════════════════ -->
+<div class="lane" id="lane-work" role="tabpanel" aria-labelledby="tab-work" hidden>
+  <div class="grid2">
+    <div>
+      <div class="card accentbrass">
+        <h2>Hands</h2>
+        <p class="lede">Agents are assigned per application, not per session. A hand proposes. A hand is never a gate.</p>
+        <table>
+          <thead><tr><th>hand</th><th>surface</th><th>assigned to</th><th>authority</th></tr></thead>
+          <tbody id="hands"></tbody>
+        </table>
+      </div>
+
+      <div class="card accentbrass">
+        <h2>DwEC · Development with Embedded Completion</h2>
+        <p class="lede">The four stages run at the edge, through this door's bindings, and close on a CLOSER computed here, not reported by the container. Plan reads the SOTR and the knob catalog from the pane; Engineer asks the container to compile the instance; Compose reads pane, sandbox and metal; Close recomputes the instance digest byte for byte and compares. Every run is recorded to the state ledger, red or green, then proposed: <code>A=LAG</code> until the Kernel accepts.</p>
+        <div class="rowbtn">
+          <button class="btn go" id="btn-dwec">Run DwEC</button>
+          <span class="tag lag">proposes only</span>
+          <span class="tag" id="dwec-last">no run this load</span>
+        </div>
+        <pre id="dwec-out" style="margin-top:13px">No run yet. The door composes it; the desk copy cannot.</pre>
+      </div>
+
+      <div class="card accentbrass">
+        <h2>Containers</h2>
+        <p class="lede">The IDE is exec, not an editor. The loop is self-contained: no pip, no git, no internet inside.</p>
+        <div id="dials"></div>
+        <div class="rowbtn">
+          <a class="btn" id="lnk-loop" href="#" target="_blank" rel="noopener">Open wasp loop</a>
+          <a class="btn" id="lnk-face" href="#" target="_blank" rel="noopener">Open SOTR plate (metal)</a>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <h2>The room</h2>
+        <p class="lede">Shared surfaces the hands and the operator both see. Opening the Editor Face means you mean the room.</p>
+        <table>
+          <thead><tr><th>surface</th><th>runtime</th><th>state</th></tr></thead>
+          <tbody id="rooms"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Admission &amp; close</h2>
+        <p class="lede">Two instruments decide whether work counts. Neither is a narrative.</p>
+        <div class="dial"><span class="lb">PowerOf3</span><span class="vl">bound + hash-matched sources<small>≥2 distinct models · not three reads of one</small></span></div>
+        <div class="dial"><span class="lb">DwEC CLOSER</span><span class="vl">Complete · Linked · Observed<small>Specified · Expected · Recorded</small></span></div>
+        <div class="dial"><span class="lb">Membrane</span><span class="vl">cited · receipted · NO_SIGNAL<small>fabrication is the forbidden fourth state</small></span></div>
+        <div class="dial"><span class="lb">Ledger</span><span class="vl"><code>runbook_ledger.jsonl</code><small>append-only hash chain</small></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DEPLOY ═══════════════════════════════════════ -->
+<div class="lane" id="lane-deploy" role="tabpanel" aria-labelledby="tab-deploy" hidden>
+
+  <div class="apexrow">
+    <h2>The apex is the bind</h2>
+    <p>Every organ answers. The front door is a <code>workers.dev</code> subdomain and <code>apex:false</code>. Binding <code>example.com</code> is what turns a set of live workers into a platform someone can be handed — the same move that turned rented compute into a product with its own domain.</p>
+    <p>This is not a reflex. It is a drawer you close deliberately: L2/L3, operator-only, minted through DECISIONS. The Oracle will route it there and stop.</p>
+    <div class="rowbtn">
+      <button class="btn esc" id="btn-apex">Draft the apex decision</button>
+      <span class="tag kern">L2/L3 · operator only</span>
+      <span class="tag ref">agents refused</span>
+    </div>
+    <pre id="apex-out" style="margin-top:13px" hidden></pre>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <div class="card accentbob">
+        <h2>Decisions</h2>
+        <p class="lede">The gesture organ. Escalations land here as files; you drag them into ACCEPT-DEFAULT or ANSWERED. This is where accepts actually mint — not in a chat, not in a TUI.</p>
+        <div class="dial"><span class="lb">tray</span><span class="vl"><code>~/Desktop/DECISIONS/</code><small>Thunar · two buckets · who-prefix filenames</small></span></div>
+        <div class="dial"><span class="lb">read-only view</span><span class="vl"><code>wosp/gesture.py --status</code></span></div>
+        <div class="dial"><span class="lb">mutating organ</span><span class="vl"><code>keystroke/decision_queue.py</code></span></div>
+        <div class="dial"><span class="lb">open</span><span class="vl" id="d-open">NO_SIGNAL<small>probe locally · not fetchable from the edge</small></span></div>
+        <p class="lede" style="margin-top:12px">A queue that grows while both buckets stay empty means the platform is producing holds, not accepts. That is a true reading and the right thing to close on.</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="card accentbob">
+        <h2>Refused from this Face</h2>
+        <p class="lede">Standing denials. The console will not offer these controls, and no hand may reach them. The third column is the operator's: what you do, not what a hand does. Five are one keystroke, two are work first, one is kept rather than done. Traced in <code>console/OPERATOR_KEYSTROKES.md</code>.</p>
+        <table>
+          <thead><tr><th>act</th><th>standing</th><th>your keystroke</th></tr></thead>
+          <tbody>
+            <tr><td><b>wrangler deploy</b> · umr-edge</td><td>hold text stands · grant already given 08-28</td><td>already yours: the 08-28 all-workers grant, exercised 09-02 (U14, your xor-identity-gate answer) and 09-04 · what remains is hygiene: reconcile the live <code>/ui</code> drift, then <code>wrangler deploy --config …/umr_edge_u15/wrangler.jsonc</code> · rollback drops LPU_KEY, re-put it · anchor d43f8260</td></tr>
+            <tr><td><b>os.cloudflare.app/deploy</b></td><td>never from an agent</td><td>your browser, your account · the 18-worker mesh is already up; what remains is the Google redirect + two <code>secret put</code></td></tr>
+            <tr><td><b>apex bind</b> example.com</td><td>the operator mints</td><td>routes block + <code>wrangler deploy</code>, then drag <code>ACCOUNT__apex-controlpane</code> to ANSWERED · a subdomain, not the root</td></tr>
+            <tr><td><b>rebuild</b> aios_k0 · wayne-gui · epidermis v3 · twin</td><td>refused</td><td>k0 never; propagate = <code>FIRE_SWAP.sh</code> three gates · wayne-gui: name the gate, then <code>nix develop .#gui</code> + cargo · v3: mean the room · twin: its manifest already exists</td></tr>
+            <tr><td><b>COMMS bodies</b></td><td>refused until observations(gid) + columns</td><td>work, in order: <code>columns</code> on ledger writes · <code>observations(gid)</code> as a VIEW · each addressee can_read · stand the ledger back up first</td></tr>
+            <tr><td><b>CITL</b></td><td>inert until the operator mints</td><td><code>python3 mint_send_grant.py &lt;draft_id&gt;</code> · ONCE or SESSION · scope + not_scope + duration · leave inert until a consumer exists</td></tr>
+            <tr><td><b>control-plane text → object storage</b></td><td>R2 is data, never prompt</td><td>kept, not done: buckets bound as data, reads receipted, bucket text never in a prompt</td></tr>
+            <tr><td><b>OpenCode</b> · npm -g · apt · Squeeze</td><td>not this seat</td><td>no apt on NixOS · nix profile, not npm -g · OpenCode is an open ruling · Squeeze: <code>serve.py --allow-propagate</code> then press once, yours alone</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Never collapse</h2>
+        <p class="lede">Four pairs that look alike and are not. Collapsing any of them is how the platform loses its accept path.</p>
+        <table>
+          <tbody>
+            <tr><td><code>workshop-backend</code></td><td>≠ <code>aios_k0</code></td></tr>
+            <tr><td>Control Pane</td><td>≠ the cloudflare-os clone</td></tr>
+            <tr><td>estate workers</td><td>≠ a Cloudflare OS instance</td></tr>
+            <tr><td>Client-User</td><td>≠ agent-builder</td></tr>
+          </tbody>
+        </table>
+        <p class="lede" style="margin-top:11px">"AIOS" has four or more referents. Never use it unqualified.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SMBOS: Wayne-OS_Temple — the call-QA ladder as the operator sees it ── -->
+<section class="apex" id="smbos">
+  <div class="hd"><h2>SMBOS · Store A call QA</h2><span class="pill wait" id="p-smbos">smbos …</span><span class="law">rc-qa: ingress at rc-qa.example.com → ladder → observations. Alerts are DRAFTED until the plane arms ringcentral · write_ops · prod at ASSISTED. Revenue is NO_SIGNAL by construction.</span></div>
+  <div class="inst">
+    <div class="ins"><h3>Ladder</h3><div class="ro"><span>subscription</span><b id="w-sub">—</b><span>sms gate</span><b id="w-sms">—</b><span>graded</span><b id="w-graded">—</b><span>in the ladder</span><b id="w-queued">—</b><span>failed</span><b id="w-failed">—</b><span>state</span><b id="w-final">—</b></div></div>
+    <div class="ins"><h3>the client headline · <span id="w-store">STOREA</span></h3><div class="ro"><span>calls graded</span><b id="w-h-graded">—</b><span>qualified</span><b id="w-h-q">—</b><span>scheduled</span><b id="w-h-s">—</b><span>close rate</span><b id="w-h-c">—</b><span>lost · why</span><b id="w-h-l">—</b><span>revenue</span><b id="w-h-r">—</b></div></div>
+  </div>
+  <div class="hd" style="margin-top:14px"><h3>Instant feedback · last 24 h</h3><span class="pill wait" id="p-feed">feed …</span><span class="law">call ends → recording (~90 s) → transcribed → graded against the client's prompt → the note lands here. SMS rides the plane. Internal only.</span></div>
+  <div id="smbos-feed" class="feed"><div class="row muted">reading the ledger…</div></div>
+</section>
+
+<!-- ── APEX: the three instruments — Time · Radius · Circuit. The Oracle reads; a hand sets. ── -->
+<section class="apex" id="apex">
+  <div class="hd"><h2>APEX · three instruments</h2><span class="pill wait" id="p-armed">armed …</span><span class="law">Time · Radius · Circuit. A fourth knob would be a setting pretending to be hardware. Workers trip lamps; they never move a toggle. The Oracle reads the three and dispatches; it never widens a gate.</span></div>
+  <div class="inst">
+    <div class="ins dialwrap">
+      <h3>Silver Precision Dial · radius</h3>
+      <div class="dpos" id="dial-pos">—</div>
+      <input type="range" id="dial" min="0" max="100" step="1" value="0" aria-label="Silver Precision Dial">
+      <div class="detents"><span>0 MONITOR</span><span>26 SHADOW</span><span>51 ASSISTED</span><span>76 AUTO</span><span>100</span></div>
+      <div class="ro"><span>detent</span><b id="dial-detent">—</b><span>confidence cutoff</span><b id="dial-conf">—</b><span>budget / epoch</span><b id="dial-budget">—</b><span>write bit</span><b id="dial-write">—</b><span>prod write</span><b id="dial-prod">—</b></div>
+      <div><button class="set" id="dial-set" disabled>set the dial</button> <span class="st" id="dial-st"></span></div>
+    </div>
+    <div class="ins">
+      <h3>Pin Chronometer · time</h3>
+      <div class="ring" id="ring"></div>
+      <div class="ro"><span>pins out</span><b id="chr-out">—</b><span>next strobe</span><b id="chr-next">—</b><span>gears</span><b id="chr-gears">—</b></div>
+      <div class="pinform">
+        <span>pin</span><select id="pin-tick"></select>
+        <span>inscription</span><input id="pin-ins" placeholder="written on the pin · the Oracle plans under it" maxlength="140">
+        <span>epoch (min)</span><input id="pin-epoch" type="number" min="5" max="1440" value="240">
+        <span>state</span><select id="pin-out"><option value="out">OUT · strobe armed</option><option value="in">IN · seated</option></select>
+      </div>
+      <div><button class="set" id="pin-set" disabled>seat / pull the pin</button> <button class="set" id="gears-set" disabled>gears</button> <span class="st" id="chr-st"></span></div>
+    </div>
+    <div class="ins">
+      <h3>Toggle Switchboard · circuit</h3>
+      <div class="board" id="board"></div>
+      <div class="ro"><span>mask</span><b id="sb-mask">—</b><span>tripped</span><b id="sb-trip">—</b></div>
+      <div class="st" id="sb-st"></div>
+    </div>
+  </div>
+  <div class="st" id="apex-st">The plane is read from <code>GET /v1/apex</code>; every write mirrors to the state organ (<code>apex:wosp</code>) where rc-qa-gate and metal read it. Root session required to set; the desk copy is read-only.</div>
+</section>
+
+</main>
+
+<footer>
+  <span>WOSP · wasp · Wayne OS Platform</span>
+  <span>console v2.11 · 2026-09-06 · DwEC at the edge · metal leg · desk attested · gated: operator@smbos · APEX · SMBOS: Store A call QA</span>
+  <span>fabricated:false</span>
+  <span>propose only · kernel disposes</span>
+  <span id="f-curve">z=0 · X₀=0.2745</span>
+</footer>
+
+<script>
+"use strict";
+
+/* ═══ ORIGINS — the organs by their public names. Repoint here when the apex binds. ═══ */
+const ORIGIN = {
+  pane : "https://wayne-aios-control-pane.example.workers.dev",
+  ide  : "https://wayne-cdn-container-sandbox.example.workers.dev",
+  face : "http://127.0.0.1:8526",        /* WayneIQ metal · artifact hub */
+  top  : "http://192.168.1.19:8892"      /* WaynePC metal · TanOak API — not this box */
+};
+
+/* ═══ DOORS — the same-origin paths the console's own Worker (wosp-console) opens. ═══
+   The pane and the IDE send no CORS headers and have no OPTIONS route. From the desk
+   (file://) the browser blocks every read before it leaves the page. Measured 2026-09-04:
+   both organs were 200 by curl while this page read NO_SIGNAL. So the console detects its
+   door at boot and says which one it is standing in. A browser block is a browser fact. */
+const DOORS = {
+  paneHealth    : "/v1/pane/health",
+  paneSotr      : "/v1/pane/sotr",
+  paneConfigure : "/v1/pane/configure",
+  ideHealth     : "/v1/ide/health",
+  ideLoop       : "/v1/ide/wosp/loop"
+};
+const AUTH = { whoami:"/v1/auth/whoami", logout:"/v1/auth/logout" };
+const APEX = { get:"/v1/apex", dial:"/v1/apex/dial", chrono:"/v1/apex/chronometer", board:"/v1/apex/switchboard" };
+const SMBOS = { card:"/v1/smbos", feed:"/v1/smbos/feed" };   /* the Store A pipeline as the operator sees it — composed on the Worker */   /* the three instruments — composed on the Worker */   /* the gate — composed on the Worker, absent on the desk */
+let DOOR = "desk";   /* "worker" once /health answers as wosp-console */
+
+/* direct address of a door when there is no Worker between the page and the organ */
+function direct(d){
+  const m = d.match(/^\/v1\/(pane|ide)(\/.*)$/);
+  const base = m[1]==="pane" ? ORIGIN.pane : ORIGIN.ide;
+  return base + (m[2]==="/health" ? m[2] : "/v1"+m[2]);
+}
+function door(d){ return DOOR==="worker" ? d : direct(d); }
+
+async function detectDoor(){
+  if(!/^https?:$/.test(location.protocol)) return "desk";
+  try{
+    const r = await fetch("/health", {cache:"no-store"});
+    const j = await r.json();
+    return j && j.service==="wosp-console" ? "worker" : "desk";
+  }catch(_){ return "desk"; }
+}
+
+/* ═══ APPLICATIONS — knob catalog, SOTR §4 · matches GET /v1/configure on the pane ═══ */
+const APPS = {
+  tanoak: {
+    name:"TanOak", client:"the operator · the client · S&L · Abe (as audiences)",
+    blurb:"Shop financial and ops. Audience splits are configuration, not new apps.",
+    hands:["ClaudeCode","container exec"],
+    knobs:[
+      {k:"location_code", type:"text",   ph:"store-001", hint:"loop default store-001 · Store A STOREA · Store B STOREB"},
+      {k:"audience",      type:"select", opts:["the client","S&L","Abe"]},
+      {k:"period",        type:"text",   ph:"current", hint:"current · or a period like 2026-08"}
+    ],
+    never:"waiter or mail bodies"
+  },
+  kssp: {
+    name:"Staffing Platform", client:"Wayne product · any agency, by knob (profile id kssp is internal)",
+    blurb:"Staffing agency instance. Transport is payload — the same unit ships and customizes. The client is a knob, not a name in the code.",
+    hands:["ClaudeCode"],
+    knobs:[
+      {k:"agency_id",      type:"text", ph:"agency-id", hint:"loop default ks-staffing until the profile is re-keyed (A3 parity: repo and container move together)"},
+      {k:"segment",        type:"text", ph:"default"},
+      {k:"instance_label", type:"text", ph:"WOSP"}
+    ],
+    never:"rewriting donor code · Firebase or auth secrets · shipping the donor archive (all rights reserved, not Wayne's)"
+  },
+  verdict: {
+    name:"Verdict", client:"Greg Davis",
+    blurb:"Financial and compliance panes, configured from his screenshot — not from a product dump.",
+    hands:["GrokBuild","container exec"],
+    knobs:[
+      {k:"pane_pricing",    type:"bool", on:true},
+      {k:"pane_compliance", type:"bool", on:true},
+      {k:"pane_dispatch",   type:"bool", on:true}
+    ],
+    never:"training on client PII · claiming z>0"
+  }
+};
+
+const HANDS = [
+  ["ClaudeCode","TUI · this seat","TanOak · Staffing Platform","propose · L0/L1"],
+  ["GrokBuild","cloud hand (Cursor) · wayne-hand pack · OpenCode via nix when activated","Verdict","propose · L0/L1 · provisioned, not activated"],
+  ["Gemini CLI","TUI","unassigned","propose · L0"],
+  ["container exec","sandbox:0.12.7-python","TanOak · Verdict","exec · no internet"],
+  ["Kernel aios_k0","metal","—","<b>dispose · the only accept</b>"]
+];
+
+/* state column is a receipt or NO_SIGNAL — never inherited */
+const ROOMS = [
+  ["WOSP Console","wosp-console","<span id=\"r-door\">detecting door…</span>"],
+  ["Control Pane","wayne-aios-control-pane","<span id=\"r-pane\">probing…</span>"],
+  ["IDE","wayne-cdn-container-sandbox","<span id=\"r-ide\">probing…</span>"],
+  ["Editor Face","artifact hub · :8526","<span id=\"r-face\">probing…</span>"],
+  ["COMMS","/v1/channels/comms","bodies refused · not probed from this page"],
+  ["TanOak API",":8892 · WaynePC metal","<span id=\"r-top\">probing…</span>"],
+  ["Publications","waynecolt.com/solutions","WcM output directory · not probed from this page"]
+];
+
+const DIALS = [
+  ["image","sandbox:0.12.7-python",""],
+  ["enableInternet","false","loop is self-contained"],
+  ["max_instances","1",""],
+  ["exec timeout","required",""],
+  ["profiles","kssp · tanoak · verdict",""],
+  ["closer","<span id=\"r-closer\">probing…</span>","from GET /v1/wosp/loop, this load"]
+];
+
+/* ═══ boot ═══ */
+const $ = id => document.getElementById(id);
+$("origin").textContent = location.origin && location.origin!=="null" ? location.origin : "file://";
+
+/* lanes — APG tabs: click, arrows, Home/End */
+const tabs = [...document.querySelectorAll(".lanebar button")];
+function selectLane(b){
+  tabs.forEach(x=>{ const on = x===b; x.setAttribute("aria-selected", on); x.tabIndex = on?0:-1; });
+  document.querySelectorAll(".lane").forEach(l=>l.hidden = (l.id !== "lane-"+b.dataset.lane));
+}
+tabs.forEach((b,i)=>{
+  b.addEventListener("click",()=>selectLane(b));
+  b.addEventListener("keydown",e=>{
+    const n = e.key==="ArrowRight" ? (i+1)%tabs.length
+            : e.key==="ArrowLeft"  ? (i-1+tabs.length)%tabs.length
+            : e.key==="Home" ? 0 : e.key==="End" ? tabs.length-1 : -1;
+    if(n<0) return;
+    e.preventDefault(); tabs[n].focus(); selectLane(tabs[n]);
+  });
+});
+
+/* tables */
+$("hands").innerHTML = HANDS.map(([a,b,c,d])=>
+  `<tr><td><b>${a}</b></td><td>${b}</td><td>${c}</td><td>${d}</td></tr>`).join("");
+$("rooms").innerHTML = ROOMS.map(([a,b,c])=>
+  `<tr><td><b>${a}</b></td><td><code>${b}</code></td><td>${c}</td></tr>`).join("");
+$("dials").innerHTML = DIALS.map(([l,v,s])=>
+  `<div class="dial"><span class="lb">${l}</span><span class="vl">${v}${s?`<small>${s}</small>`:""}</span></div>`).join("");
+$("lnk-face").href = ORIGIN.face + "/publications/serve/SOTR_1_WAYNE_WOSP.html";
+
+/* apps */
+let current = "tanoak";
+$("apps").innerHTML = Object.entries(APPS).map(([id,a])=>
+  `<button class="app" data-app="${id}" aria-pressed="${id===current}">
+     <div class="nm">${a.name}</div><div class="cu">${a.client}</div>
+     <div class="kb">${a.blurb}</div></button>`).join("");
+document.querySelectorAll(".app").forEach(b=>{
+  b.addEventListener("click",()=>{
+    current = b.dataset.app;
+    document.querySelectorAll(".app").forEach(x=>x.setAttribute("aria-pressed", x===b));
+    renderKnobs();
+  });
+});
+
+function renderKnobs(){
+  const a = APPS[current];
+  $("cfg-lede").innerHTML = `Configuring <b style="color:var(--ink)">${a.name}</b> — ${a.blurb} Hands assigned: ${a.hands.join(" · ")}. Never: ${a.never}.`;
+  $("knobs").innerHTML = a.knobs.map(k=>{
+    if(k.type==="select") return `<div class="field"><label for="k-${k.k}">${k.k}</label>
+      <select id="k-${k.k}" data-k="${k.k}">${k.opts.map(o=>`<option>${o}</option>`).join("")}</select></div>`;
+    if(k.type==="bool") return `<div class="field"><label class="bool" for="k-${k.k}">
+      <input type="checkbox" id="k-${k.k}" data-bool="${k.k}" ${k.on?"checked":""}> ${k.k}</label></div>`;
+    return `<div class="field"><label for="k-${k.k}">${k.k}</label>
+      <input id="k-${k.k}" data-k="${k.k}" placeholder="${k.ph||""}">
+      ${k.hint?`<div class="hint">${k.hint}</div>`:""}</div>`;
+  }).join("");
+  $("cfg-out").textContent = "No proposal composed yet.";
+  $("lnk-loop").href = door(DOORS.ideLoop) + "?profile=" + current;
+  $("lnk-loop").textContent = `Open wasp loop · ${current}`;
+}
+renderKnobs();
+
+function collect(){
+  const body = { profile: current, knobs: {} };
+  document.querySelectorAll("[data-k]").forEach(el=>{ if(el.value) body.knobs[el.dataset.k] = el.value; });
+  document.querySelectorAll("[data-bool]").forEach(el=>{ body.knobs[el.dataset.bool] = !!el.checked; });
+  return body;
+}
+
+function copied(btn, txt){
+  const was = btn.textContent;
+  const p = navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(txt) : Promise.reject(new Error("no clipboard"));
+  p.then(()=>{ btn.textContent = "copied"; }, ()=>{ btn.textContent = "select + copy"; })
+   .finally(()=>setTimeout(()=>{ btn.textContent = was; }, 1400));
+}
+
+/* configure → propose. Never accepts. */
+$("btn-curl").addEventListener("click",()=>{
+  const body = collect();
+  const c = `curl -sS -X POST ${direct(DOORS.paneConfigure)} \\\n  -H 'content-type: application/json' \\\n  -d '${JSON.stringify(body)}'`;
+  $("cfg-out").textContent = c;
+  copied($("btn-curl"), c);
+});
+
+$("btn-propose").addEventListener("click", async ()=>{
+  const body = collect();
+  const url = door(DOORS.paneConfigure);
+  $("cfg-out").textContent = `POST ${url} …`;
+  $("s-intent").textContent = "sent";
+  try{
+    const r = await fetch(url, { method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify(body) });
+    const t = await r.text();
+    let j=null; try{ j=JSON.parse(t); }catch(_){}
+    const A = j && typeof j.A==="string" ? j.A.toUpperCase() : (/PUBLISH/i.test(t) ? "PUBLISH" : "LAG");
+    $("cfg-out").textContent = `HTTP ${r.status}  via ${DOOR}\n\n${t}\n\n— exit_class governs the durable write. If A=LAG, the Kernel has not accepted; nothing is published.`;
+    $("s-kernel").textContent = "A=" + A;
+  }catch(e){
+    $("cfg-out").textContent = DOOR==="desk"
+      ? `NO_SIGNAL (browser) — ${e.message}\n\nThe request was blocked before it left this page: the pane sends no CORS headers, and a JSON POST needs a preflight the pane does not answer. Nothing was proposed and nothing was accepted. Use "Copy as curl", or open the console from its Worker door.`
+      : `NO_SIGNAL — ${e.message}\n\nThe request did not reach the Face. Nothing was proposed and nothing was accepted.`;
+  }
+});
+
+/* ═══ DwEC — the four stages at the edge; composed by the Worker, never by the desk copy ═══ */
+const DWEC = { run:"/v1/dwec/run", runs:"/v1/dwec/runs", contract:"/v1/dwec" };
+function fmtDwec(r){
+  const y = v => v ? "✓" : "✗";
+  const C = r.CLOSER || {};
+  const p = r.stages && r.stages.plan || {}, e = r.stages && r.stages.engineer || {}, c = r.stages && r.stages.compose || {}, rec = r.stages && r.stages.record || {};
+  const legs = (r.powerof3 && r.powerof3.legs || []).map(l=>`${l.leg} ${l.verdict}${l.hash?" "+l.hash:""}`).join(" · ");
+  return `profile  ${r.profile}   ${r.ts}   ${r.ms} ms
+
+PLAN     sotr ${p.http&&p.http.sotr}  catalog ${p.http&&p.http.catalog}  knobs ${(p.knob_names||[]).join(" · ")||"NO_SIGNAL"}
+ENGINEER ide ${e.http}  exit ${e.exitCode}  finished ${e.finished}  digest ${(r.reported_digest||"NO_SIGNAL").slice(0,16)}
+COMPOSE  pane ${c.pane&&c.pane.http}  sandbox ${c.sandbox&&c.sandbox.http}  metal ${c.metal&&c.metal.membrane ? "NO_SIGNAL" : c.metal ? `${c.metal.seat} ${c.metal.fresh?"fresh":"stale"} ${c.metal.age_s}s · bridge ${c.metal.bridge?c.metal.bridge.completed+"/"+c.metal.bridge.agents+" agents":"—"} · digest ${(c.metal.digest||"").slice(0,16)}` : "—"}
+CLOSE    C ${y(C.Complete)}  L ${y(C.Linked)}  O ${y(C.Observed)}  S ${y(C.Specified)}  E ${y(C.Expected)}  R ${y(C.Recorded)}   ${r.green?"GREEN":"RED "+r.red.join(",")}
+         expected ${(r.expected_digest||"NO_SIGNAL").slice(0,16)}  reported ${(r.reported_digest||"NO_SIGNAL").slice(0,16)}
+RECORD   ${rec.ok?`${rec.workspace} · ledger digest ${(rec.ledger_digest||"").slice(0,16)}`:"NO_SIGNAL "+(rec.error||"")}
+PowerOf3 ${r.powerof3?`${r.powerof3.admitted?"ADMITTED":"REFUSED"} — ${r.powerof3.reason}`:"—"}
+         ${legs}
+dispose  A=${r.A}   kernel_accept:${r.kernel_accept}   fabricated:${r.fabricated}`;
+}
+$("btn-dwec").addEventListener("click", async ()=>{
+  if(DOOR!=="worker"){ $("dwec-out").textContent = "DwEC runs only through the Worker door. Open the console at its hostname, not from the desk."; return; }
+  $("btn-dwec").disabled = true; $("dwec-out").textContent = `POST ${DWEC.run} {profile:${current}} …`;
+  try{
+    const r = await fetch(DWEC.run, {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify({profile: current})});
+    const j = await r.json();
+    if(!j.kind){ $("dwec-out").textContent = `HTTP ${r.status}\n${JSON.stringify(j,null,1)}`; return; }
+    $("dwec-out").textContent = fmtDwec(j);
+    $("dwec-last").textContent = `${j.profile} ${j.green?"green":"red"} · A=${j.A}`;
+    $("dwec-last").className = "tag " + (j.green?"live":"ref");
+    $("s-kernel").textContent = "A=" + j.A;
+  }catch(e){ $("dwec-out").textContent = `NO_SIGNAL — ${e.message}`; }
+  finally{ $("btn-dwec").disabled = false; }
+});
+async function lastDwec(){
+  if(DOOR!=="worker") return;
+  try{ const r = await fetch(DWEC.runs, {cache:"no-store"}); const j = await r.json();
+    if(j.last_run){ $("dwec-last").textContent = `last ${j.last_run.profile} ${j.last_run.green?"green":"red"} · A=${j.last_run.A} · ${j.runs.length} on ledger`; $("dwec-last").className = "tag " + (j.last_run.green?"live":"ref"); }
+  }catch(_){}
+}
+
+/* ═══ ORACLE — classify, then name the hand. Routes; never accepts. ═══
+   DEPLOY triggers are explicit acts, not business words: "production numbers" is a USE query,
+   "ship to production" is a deploy. Between WORK and USE the lane with more signal wins; a tie
+   goes to USE, because the platform's class is Client-User configure. */
+const L23   = /\b(deploy(s|ed|ing|ment)?|wrangler|apex|bind (the )?(apex|domain|hostname)|dns|go(ing)? live|ship (it |this )?to prod(uction)?|publish live|to production|rebuild (the )?kernel|cutover)\b/i;
+const WORKY = /\b(build|refactor|debug|run (the )?tests?|unit tests?|container|exec|repo|git|commit|clone|install|shell|script|compile|pip|stack ?trace)\b/gi;
+const USEY  = /\b(show|report|configure|knobs?|audience|period|location|panes?|dashboard|splits?|payroll|present|view|numbers|margin|revenue|hours|schedule|compare)\b/gi;
+
+$("btn-oracle").addEventListener("click",()=>{
+  const q = $("oq").value.trim();
+  if(!q){ $("oracle-out").textContent = "Say what you want. Plain language is enough."; return; }
+  $("s-oracle").textContent = "classifying";
+
+  const w = (q.match(WORKY)||[]).length, u = (q.match(USEY)||[]).length;
+  let lane, level, hand, route, note;
+  if(L23.test(q)){
+    lane="DEPLOY"; level="L2/L3"; hand="none — refused to hands";
+    route="~/Desktop/DECISIONS/  (operator mints)";
+    note="This needs an authority no agent holds and this console will not offer. It is a deliberate act, not a reflex. Drafted as a decision file for you to drag.";
+  } else if(u>0 && u>=w){
+    lane="USE"; level="L0";
+    hand="none — this is a knob, not a build";
+    route=`POST ${direct(DOORS.paneConfigure)}  (profile=${current})`;
+    note="Configuration of a running application. Turn the knob in the panel on the left. Returns A=LAG until metal accepts.";
+  } else if(w>0){
+    lane="WORK"; level="L0/L1";
+    hand = APPS[current].hands[0];
+    route=`${direct(DOORS.ideLoop)}?profile=${current}`;
+    note="A hand acts inside the container. No internet, no pip, no git in there — the loop is self-contained. Result returns as a proposal.";
+  } else {
+    lane="UNCLASSIFIED"; level="—"; hand="none — no confident lane"; route="—";
+    note="No confident lane. Say it with a verb: show / configure / build / deploy. Guessing here would be fabrication.";
+  }
+  $("s-hand").textContent = hand.startsWith("none") ? "idle" : "named";
+  $("s-oracle").textContent = "ruled";
+  $("oracle-out").textContent =
+`intent   ${q}
+
+lane     ${lane}   (signal use=${u} work=${w})
+level    ${level}
+hand     ${hand}
+route    ${route}
+accept   Kernel only — this ruling accepts nothing
+
+${note}`;
+});
+
+/* apex decision draft */
+$("btn-apex").addEventListener("click",()=>{
+  const d = new Date().toISOString().slice(0,10).replace(/-/g,"");
+  const txt =
+`FILENAME  operator_APEX_BIND_${d}.md
+TRAY      ~/Desktop/DECISIONS/   → drag to ACCEPT-DEFAULT or ANSWERED
+
+DECISION
+  Bind apex example.com to the WOSP Face.
+
+WHY NOW
+  Every organ answers. Control Pane, container sandbox and wasp loop are live.
+  The only thing between a set of workers and a platform someone can be handed
+  is the front door. apex:false is the single blocking bind.
+
+LEVEL     L2/L3 — unreachable by runbook flag. Operator only. No agent may fire.
+
+BEFORE
+  [ ] Face served and probing green from its intended origin
+  [ ] Route table: routes appear only where the grep law allows
+  [ ] Kernel stays A=LAG on POST /v1/propose through the change
+  [ ] Rollback command written AND run once before the bind
+
+AFTER (receipts)
+  [ ] apex GET / → 200
+  [ ] /health → kernel_accept + apex fields re-read, not inherited
+  [ ] ledger appended, sha identical source → handoff → ledger
+  [ ] rollback demonstrated, output pasted
+
+NOT IN THIS DECISION
+  umr-edge deploy · Squeeze · rebuilding any kernel organ · CITL mint
+
+fabricated:false`;
+  const el = $("apex-out"); el.hidden = false; el.textContent = txt;
+  copied($("btn-apex"), txt);
+});
+
+/* ═══ live probes — honest, no inherited state ═══ */
+const lines = [];
+function say(s){ lines.push(s); $("probelog").textContent = lines.join("\n"); }
+function pill(id, cls, txt){ const e=$(id); e.textContent=txt; e.className="pill "+cls; }
+function room(id, txt){ const e=$(id); if(e) e.textContent = txt; }
+
+const BLOCKED = "NO_SIGNAL (browser)";
+function blockedWhy(){
+  return DOOR==="desk"
+    ? "blocked before leaving the page — no CORS on the organ. Not a dead organ: curl it, or open the Worker door."
+    : "fetch failed";
+}
+
+async function probe(label, url){
+  try{
+    const r = await fetch(url, {cache:"no-store"});
+    const t = await r.text();
+    let j=null; try{ j=JSON.parse(t); }catch(_){}
+    say(`${label.padEnd(7)} ${r.status}${j&&j.service?"  "+j.service:""}${j&&j.wosp?"  wosp="+j.wosp:""}${j&&j.kernel_accept===false?"  kernel_accept:false":""}${j&&j.apex===false?"  apex:false":""}`);
+    return {ok:r.ok, j, status:r.status};
+  }catch(e){
+    say(`${label.padEnd(7)} ${BLOCKED}  ${blockedWhy()}`);
+    return {ok:false, j:null, blocked:true};
+  }
+}
+
+async function runProbes(){
+  lines.length = 0; $("probelog").textContent = "probing…";
+  DOOR = await detectDoor();
+  $("door").textContent = DOOR==="worker" ? "wosp-console (same-origin doors)" : "desk (no door — direct, CORS applies)";
+  room("r-door", DOOR==="worker" ? `this page · doors ${Object.values(DOORS).join(" · ")}` : "desk copy · no Worker between page and organs");
+  say(`door    ${DOOR}${DOOR==="desk" ? "  (file:// or a host that is not wosp-console)" : "  /health answered as wosp-console"}`);
+  renderKnobs();
+
+  const pane = await probe("pane", door(DOORS.paneHealth));
+  pill("p-pane", pane.ok?"on":(pane.blocked?"wait":"no"), pane.ok?"pane live":(pane.blocked?"pane blocked (browser)":"pane NO_SIGNAL"));
+  room("r-pane", pane.ok ? `${pane.status} · ${pane.j&&pane.j.organ||"live"}` : (pane.blocked ? BLOCKED : "NO_SIGNAL"));
+
+  const ide = await probe("ide", door(DOORS.ideHealth));
+  pill("p-ide", ide.ok?(ide.j&&ide.j.wosp?"on":"wait"):(ide.blocked?"wait":"no"),
+       ide.ok?(ide.j&&ide.j.wosp?"ide + wasp":"ide live"):(ide.blocked?"ide blocked (browser)":"ide NO_SIGNAL"));
+  room("r-ide", ide.ok ? `${ide.status} · exec · ${ide.j&&ide.j.wosp||""}` : (ide.blocked ? BLOCKED : "NO_SIGNAL"));
+
+  /* the loop itself — CLOSER is read from the run, never from the plate */
+  if(ide.ok){
+    const loop = await probe("loop", door(DOORS.ideLoop) + "?profile=" + current);
+    const C = loop.j && loop.j.loop && loop.j.loop.CLOSER;
+    if(C){ const n = Object.values(C).filter(Boolean).length; room("r-closer", `${current} ${n}/6${loop.j.loop.finished?" · finished":""}`); }
+    else room("r-closer", loop.ok ? "ran · no CLOSER in body" : "NO_SIGNAL");
+  } else room("r-closer", "NO_SIGNAL — ide unreachable from this page");
+
+  /* metal organs — reachable only from the desk on the LAN; from https they are mixed content */
+  if(DOOR==="desk"){
+    const face = await probe("face", ORIGIN.face + "/health");
+    pill("p-face", face.ok?"on":"wait", face.ok?"face live":"face NO_SIGNAL");
+    room("r-face", face.ok ? `${face.status} · ${face.j&&face.j.publications||"?"} publications` : "NO_SIGNAL from this page");
+    const top = await probe("top", ORIGIN.top + "/health");
+    room("r-top", top.ok ? `${top.status} live` : (top.blocked ? BLOCKED : "NO_SIGNAL"));
+  } else {
+    pill("p-face","wait","face metal-only");
+    say("face    not probed — :8526 is WayneIQ metal; unreachable from an https origin (mixed content)");
+    room("r-face", "not probed from the edge · metal");
+    say("top     not probed — :8892 is WaynePC metal; unreachable from an https origin");
+    room("r-top", "not probed from the edge · metal");
+  }
+
+  const ka = pane.j && pane.j.kernel_accept;
+  const ax = pane.j && pane.j.apex;
+  pill("p-kern","kernel", ka===false ? "kernel A=LAG" : ka===true ? "kernel ACCEPT" : "kernel NO_SIGNAL");
+  $("s-kernel").textContent = ka===false ? "A=LAG" : ka===true ? "ACCEPT" : "NO_SIGNAL";
+  if(ax===false) say(/\.workers\.dev$/.test(location.host) || DOOR==="desk"
+    ? "apex    false — the pane's front door is still workers.dev"
+    : `apex    false — this door is a subdomain (${location.host}), not the root; the pane stays on workers.dev`);
+
+  await deskFromEdge();
+  say("");
+  say("membrane: every line above is a receipt, a browser block, or NO_SIGNAL. Nothing is inherited.");
+  lastDwec();
+}
+
+/* the desk — WayneIQ metal attests the tray, the WATCH headline and its local organs to the state organ every 10 min;
+   the door reads that. From the desk copy there is no door, so the line says where to look. */
+const DESK = "/v1/desk";
+async function deskFromEdge(){
+  const dial = $("d-open");
+  if(DOOR!=="worker"){
+    pill("p-desk","wait","desk local-probe");
+    say("desk    DECISIONS is a local tray — run `wosp/gesture.py --status` on metal");
+    return;
+  }
+  try{
+    const r = await fetch(DESK, {cache:"no-store"});
+    const j = await r.json();
+    if(r.status!==200 || !j.desk){
+      pill("p-desk","no","desk NO_SIGNAL");
+      say(`desk    NO_SIGNAL — ${j.reason||"no attestation"}`);
+      dial.innerHTML = `NO_SIGNAL<small>${j.reason||"wayneiq-desk-attest.timer has not written"}</small>`;
+      return;
+    }
+    const d = j.desk, w = j.watch||{}, age = j.age_s;
+    const fresh = j.membrane==="VERIFIED";
+    pill("p-desk", fresh?"on":"wait", `desk ${d.open_n} open · ${fresh?Math.round(age/60)+"m":"stale "+Math.round(age/60)+"m"}`);
+    say(`desk    ${d.open_n} open · answered ${d.answered} · accept-default ${d.accept_default} · attested ${age}s ago by ${j.seat}${fresh?"":"  (STALE — two beats missed)"}`);
+    if(w.headline) say(`watch   ${w.headline} · GREEN=${(w.counts||{}).GREEN??"?"} NO_SIGNAL=${(w.counts||{}).NO_SIGNAL??"?"} BLOCKED-ON-HUMAN=${(w.counts||{})["BLOCKED-ON-HUMAN"]??"?"} · receipt ${w.receipt_age_s}s old${w.stale?" (stale)":""}`);
+    if(j.local) say(`metal   comm tile ${j.local.comm_tile&&j.local.comm_tile.http} · artifact hub ${j.local.artifact_hub&&j.local.artifact_hub.http} · read on WayneIQ, not from here`);
+    dial.innerHTML = `${d.open_n} open<small>${(d.open||[]).map(f=>f.replace(/\.md$/,"")).join(" · ")||"none"} · attested ${Math.round(age/60)}m ago${fresh?"":" · STALE"}</small>`;
+  }catch(e){
+    pill("p-desk","no","desk NO_SIGNAL");
+    say(`desk    NO_SIGNAL — ${e.message}`);
+  }
+}
+$("btn-reprobe").addEventListener("click", runProbes);
+/* the gate: on the Worker the page asks who holds the session before it probes anything.
+   401 means the cookie is gone — go to the door. On the desk there is no gate to ask. */
+async function whoAmI(){
+  if(!/^https?:$/.test(location.protocol)){ pill("p-who","wait","who desk"); $("btn-out").hidden = true; return true; }
+  try{
+    const r = await fetch(AUTH.whoami, {cache:"no-store"});
+    if(r.status===401){ location.replace("/login"); return false; }
+    const j = await r.json();
+    if(r.status!==200 || !j.user){ pill("p-who","no",`who ${j.reason||"NO_SIGNAL"}`); return true; }
+    pill("p-who","on",`${j.user} · ${j.role}`);
+    APEX_ROOT = j.role === "root";
+    return true;
+  }catch(e){ pill("p-who","no","who NO_SIGNAL"); return true; }
+}
+$("btn-out").addEventListener("click", async (ev) => {
+  ev.preventDefault();
+  try{ await fetch(AUTH.logout, {method:"POST"}); }catch(_){}
+  location.replace("/login");
+});
+/* ═══ APEX — render the three instruments from GET /v1/apex; writes go back as PUTs and re-render from the reply. ═══ */
+let APEXV = null, APEX_ROOT = false, SEL_TICK = 120;
+const money = (x) => "$" + (Math.round(x*100)/100).toFixed(2);
+const hhmm = (t) => String(Math.floor(t/60)).padStart(2,"0") + ":" + String(t%60).padStart(2,"0");
+function renderApex(v){
+  APEXV = v;
+  pill("p-armed", v.armed==="AIR-GAP"?"no":(v.armed==="ARMED SLEEP"||v.armed==="GUARDED EPOCH"?"on":"wait"), `armed ${v.armed}`);
+  const d = v.dial; $("dial").value = d.position; $("dial-pos").textContent = d.position; $("dial-detent").textContent = d.detent;
+  $("dial-conf").textContent = d.confidence.toFixed(3); $("dial-budget").textContent = money(d.budget_usd); $("dial-write").textContent = d.write?"ON (d ≥ 50)":"OFF (d < 50)"; $("dial-prod").textContent = d.prod_write?"ASSISTED+":"no — SHADOW or below";
+  const c = v.chronometer; $("chr-out").textContent = c.pins_out; $("chr-gears").textContent = c.gears?"engaged":"DISENGAGED"; $("chr-next").textContent = c.next?`${hhmm(c.next.tick)}Z in ${c.next.wait_min} min · "${c.next.inscription}" · ${c.next.epoch} min`:(c.gears?"none armed":"gears off");
+  const R=100, cx=110, cy=110; let svg = `<svg viewBox="0 0 220 220" width="100%" height="100%" aria-label="24-hour pin ring">`;
+  svg += `<circle cx="${cx}" cy="${cy}" r="${R-14}" fill="none" stroke="var(--line)"/>`;
+  for(const p of c.pins){ const a = (p.tick/1440)*2*Math.PI - Math.PI/2; const r1 = R-8, r2 = p.tick%60===0 ? R+4 : R; const x1=cx+r1*Math.cos(a), y1=cy+r1*Math.sin(a), x2=cx+r2*Math.cos(a), y2=cy+r2*Math.sin(a);
+    svg += `<line class="pin${p.out?" out":""}${p.tick===SEL_TICK?" sel":""}" data-tick="${p.tick}" x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${p.out?"var(--teal)":"var(--line2)"}" stroke-width="${p.out?3:1.5}"><title>${hhmm(p.tick)}Z${p.out?" · OUT · "+p.inscription:""}</title></line>`; }
+  const now = new Date(); const nm = now.getUTCHours()*60+now.getUTCMinutes(); const an = (nm/1440)*2*Math.PI - Math.PI/2;
+  svg += `<line class="hand" x1="${cx}" y1="${cy}" x2="${(cx+(R-20)*Math.cos(an)).toFixed(1)}" y2="${(cy+(R-20)*Math.sin(an)).toFixed(1)}"/><text x="${cx}" y="${cy+4}" text-anchor="middle" font-size="11" fill="var(--dim)" font-family="var(--mono)">${hhmm(nm)}Z</text></svg>`;
+  $("ring").innerHTML = svg;
+  const sel = $("pin-tick"); if(!sel.dataset.filled){ sel.innerHTML = c.pins.map(p=>`<option value="${p.tick}">${hhmm(p.tick)}Z</option>`).join(""); sel.dataset.filled="1"; }
+  sel.value = String(SEL_TICK); const sp = c.pins.find(p=>p.tick===SEL_TICK); if(sp){ $("pin-ins").value = sp.inscription||""; $("pin-epoch").value = sp.epoch||240; $("pin-out").value = sp.out?"out":"in"; }
+  $("gears-set").textContent = c.gears?"disengage gears":"engage gears";
+  const sb = v.switchboard; $("board").innerHTML = sb.circuits.map(x=>`<div class="sw" data-id="${x.id}"><button class="lever${x.toggle==="ON"?" on":""}" data-act="toggle" ${APEX_ROOT?"":"disabled"}>${x.toggle==="ON"?"(●) ON":"OFF (●)"}</button><span>${x.id}${x.guarded?' <span class="guard">▣ flip-cover</span>':""}${x.id==="comms"?' <span class="guard" title="ucc.example.com is the LAN UCC :8528 through the pre-existing tunnel — the one circuit that reaches the LAN">⇄ LAN via tunnel</span>':""}</span><span class="lamp ${x.lamp==="OK"?"ok":(x.lamp==="TRIPPED"?"trip":"")}">${x.lamp==="TRIPPED"?"● TRIPPED · "+((x.tripped||{}).by||"?"):(x.lamp==="OK"?"● ok":"○ muted")}</span>${x.lamp==="TRIPPED"&&APEX_ROOT?'<button class="rst" data-act="reset">reset</button>':"<span></span>"}</div>`).join("");
+  $("sb-mask").textContent = v.mask.length?v.mask.join(" · "):"none"; $("sb-trip").textContent = v.tripped.length?v.tripped.join(" · "):"none";
+  for(const id of ["dial-set","pin-set","gears-set"]) $(id).disabled = !APEX_ROOT;
+  $("apex-st").textContent = `${v.updated_at?`set ${v.updated_at.slice(0,16).replace("T"," ")}Z by ${v.by}`:"never set — cold defaults"} · ${APEX_ROOT?"root session: the instruments are yours":"read-only"} · the state organ mirror is what rc-qa-gate and metal read`;
+}
+async function apexPut(path, body, stId){
+  $(stId).textContent = "…";
+  try{ const r = await fetch(path, {method:"PUT", headers:{"content-type":"application/json"}, body: JSON.stringify(body)}); const j = await r.json();
+    if(r.status!==200){ $(stId).textContent = `refused ${r.status} — ${j.reason||"?"}`; return; }
+    renderApex(j); $(stId).textContent = `set · mirrored ${j.mirrored?"to the state organ":"FAILED — the gate will read the old value"}`;
+  }catch(e){ $(stId).textContent = `NO_SIGNAL — ${e.message}`; }
+}
+async function loadWost(){
+  if(DOOR!=="worker"){ pill("p-smbos","wait","smbos desk"); return; }
+  try{
+    const r = await fetch(SMBOS.card, {cache:"no-store"}); const j = await r.json();
+    if(r.status!==200){ pill("p-smbos","no","smbos NO_SIGNAL"); $("w-final").textContent = j.reason||"NO_SIGNAL"; return; }
+    const sub = j.subscription||{}, sms = j.sms||{}, L = j.ladder||{}, H = j.headline||{};
+    $("w-sub").textContent = sub.id ? `${sub.scope||"?"} · ${String(sub.id).slice(0,8)} · to ${String(sub.expires||"").slice(0,10)}` : "NO_SIGNAL";
+    $("w-sms").textContent = sms.armed ? `ARMED · ${sms.by}` : `drafting · ${sms.by||"not armed"}`;
+    $("w-graded").textContent = L.graded; $("w-queued").textContent = L.queued; $("w-failed").textContent = L.failed; $("w-final").textContent = L.final ? "FINAL" : "GRADING IN PROGRESS";
+    $("w-store").textContent = j.store; $("w-h-graded").textContent = H.calls_graded ?? "—"; $("w-h-q").textContent = H.qualified ?? "—"; $("w-h-s").textContent = H.scheduled ?? "—"; $("w-h-c").textContent = H.close_rate_pct==null ? "—" : H.close_rate_pct+"%";
+    $("w-h-l").textContent = `${H.lost ?? "—"} · ` + Object.entries(H.lost_why||{}).map(([k,v])=>`${k} ${v}`).join(" · ");
+    $("w-h-r").textContent = H.revenue || "NO_SIGNAL";
+    $("w-alerts").innerHTML = (j.alerts_24h||[]).length ? (j.alerts_24h||[]).map(a=>`<span>${a.status}</span><b>${a.n}</b>`).join("") : "<span>none</span><b>0</b>";
+    pill("p-smbos", L.final?"on":"wait", `smbos ${L.graded} graded${L.final?" · FINAL":""}`);
+  }catch(e){ pill("p-smbos","no","smbos NO_SIGNAL"); }
+}
+async function loadWostFeed(){
+  if(DOOR!=="worker"){ pill("p-feed","wait","feed desk"); return; }
+  try{
+    const r = await fetch(SMBOS.feed, {cache:"no-store"}); const j = await r.json();
+    if(r.status!==200){ pill("p-feed","no","feed NO_SIGNAL"); $("smbos-feed").innerHTML = '<div class="row muted">'+(j.reason||"NO_SIGNAL")+'</div>'; return; }
+    const rows = j.calls||[];
+    $("smbos-feed").innerHTML = rows.length ? rows.map(c => `<div class="row${c.alert?" trip":""}"><span class="t">${String(c.start_time||"").slice(11,16)}Z</span><span class="who">${c.rep_name||"Unassigned"}</span><span class="out ${c.intake_outcome==="Scheduled"?"ok":(c.qualified?"lost":"")}">${c.intake_outcome||"—"}</span><span class="sc">${c.total_score??"—"}/20</span><span class="note">${(c.coaching_note||"").slice(0,140)}</span>${c.alert?`<span class="al">${c.alert}</span>`:""}</div>`).join("") : '<div class="row muted">no graded calls in the last 24 h</div>';
+    pill("p-feed", rows.length?"on":"wait", `feed ${rows.length} · ${j.store}`);
+  }catch(e){ pill("p-feed","no","feed NO_SIGNAL"); }
+}
+async function loadApex(){
+  if(DOOR!=="worker"){ pill("p-armed","wait","armed desk"); $("apex-st").textContent = "desk copy — the instruments live on the Worker at <your-console-host>"; return; }
+  try{ const r = await fetch(APEX.get, {cache:"no-store"}); if(r.status!==200){ pill("p-armed","no","armed NO_SIGNAL"); return; } renderApex(await r.json()); }
+  catch(e){ pill("p-armed","no","armed NO_SIGNAL"); }
+}
+$("dial").addEventListener("input", () => { $("dial-pos").textContent = $("dial").value; });
+$("dial-set").addEventListener("click", () => apexPut(APEX.dial, {position: Number($("dial").value)}, "dial-st"));
+$("pin-tick").addEventListener("change", () => { SEL_TICK = Number($("pin-tick").value); if(APEXV) renderApex(APEXV); });
+$("ring").addEventListener("click", (ev) => { const t = ev.target && ev.target.dataset && ev.target.dataset.tick; if(t!==undefined && t!==null && t!==""){ SEL_TICK = Number(t); if(APEXV) renderApex(APEXV); } });
+$("pin-set").addEventListener("click", () => apexPut(APEX.chrono, {tick: SEL_TICK, out: $("pin-out").value==="out", inscription: $("pin-ins").value, epoch: Number($("pin-epoch").value)}, "chr-st"));
+$("gears-set").addEventListener("click", () => apexPut(APEX.chrono, {gears: !(APEXV && APEXV.chronometer.gears)}, "chr-st"));
+$("board").addEventListener("click", (ev) => {
+  const b = ev.target && ev.target.closest ? ev.target.closest("button") : null; if(!b || !APEXV) return; const row = b.closest(".sw"); const id = row && row.dataset.id; if(!id) return;
+  const c = APEXV.switchboard.circuits.find(x=>x.id===id); if(!c) return;
+  if(b.dataset.act==="reset") return apexPut(APEX.board, {id, reset:true}, "sb-st");
+  const on = c.toggle!=="ON";
+  if(on && c.guarded && !b.dataset.armed){ b.dataset.armed="1"; b.textContent = "flip-cover open · click again"; $("sb-st").textContent = `${id} is guarded (billable or destructive) — second click closes the circuit`; return; }
+  apexPut(APEX.board, {id, toggle: on?"ON":"OFF"}, "sb-st");
+});
+whoAmI().then(ok => { if(ok){ runProbes(); loadApex(); loadWost(); loadWostFeed(); } });
+</script>
+</body>
+</html>

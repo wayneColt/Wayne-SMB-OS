@@ -1,0 +1,20 @@
+{
+  // rc-qa-ingress — sys-net. The ONLY worker of the three with a hostname. It verifies,
+  // echoes the handshake, dedupes, enqueues, and returns 200 in single-digit ms. It never
+  // downloads, transcribes, infers or texts. HO-RCQA-001 D6. fabricated:false
+  "name": "rc-qa-ingress",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  // a custom domain instead of the spec's `routes` block: the wrangler token can bind a Worker
+  // custom domain on the account (proven on <your-console-host>) but cannot write zone DNS,
+  // which a route needs first. Same property the spec wants: this is the only routed worker.
+  "routes": [ { "pattern": "rc-qa.example.com", "custom_domain": true } ],
+  "kv_namespaces": [ { "binding": "SEEN", "id": "<kv-namespace-id>" } ],
+  "queues": { "producers": [ { "binding": "QA_QUEUE", "queue": "rc-qa-jobs" } ] }
+  // secrets (wrangler secret put): RC_VALIDATION_TOKEN — the developer-specified token RingCentral
+  // sends back in the Validation-Token header on every delivery. RingCentral cannot send custom
+  // headers, so the spec's X-Wayne-Hook does not exist on the wire; this is the shared secret.
+}

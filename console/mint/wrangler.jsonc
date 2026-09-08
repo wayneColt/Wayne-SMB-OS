@@ -1,0 +1,16 @@
+{
+  // wosp-mint — SACRIFICIAL. Seeds the WOSP_AUTH namespace once with the operator operator@smbos
+  // from a password generated on the operator's glass, then refuses forever (410). Burn it after the
+  // mint:   wrangler delete --name wosp-mint --force   (from this directory)
+  // It shares the console's KV namespace and nothing else. fabricated:false
+  "name": "smbos-mint",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-30",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "assets": { "directory": "./public", "binding": "ASSETS", "not_found_handling": "none", "run_worker_first": true },
+  "kv_namespaces": [
+    { "binding": "WOSP_AUTH", "id": "<kv-namespace-id>" }
+  ]
+}

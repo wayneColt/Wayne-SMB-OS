@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>Mint · operator@smbos</title>
+<style>
+:root{--bg:#05070a;--panel:#0a1016;--tile:#0e161e;--line:#182028;--line2:#22303a;--ink:#d7e0ea;--dim:#6a7a88;--mute:#3d4c58;--teal:#6cd6c6;--brass:#c4a05a;--kern:#4f8ef7;--drop:#e07070;--ok:#2dd4a0;--mono:"IBM Plex Mono","JetBrains Mono",ui-monospace,Menlo,monospace;--serif:"Fraunces","Iowan Old Style",Georgia,serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--mono);min-height:100vh;display:grid;place-items:start center;padding:48px 20px}
+main{width:min(720px,100%);display:grid;gap:18px}
+.mark{font:600 34px/1 var(--serif);letter-spacing:.02em}.mark em{font-style:normal;color:var(--brass)}
+h1{font:500 22px/1.25 var(--serif);margin:0}p{margin:0;color:var(--dim)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px;display:grid;gap:12px}
+.card h2{margin:0;font:12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.pw{font:500 22px/1.4 var(--mono);letter-spacing:.06em;background:var(--tile);border:1px dashed var(--line2);border-radius:4px;padding:14px 16px;min-height:56px;word-break:break-all;user-select:all}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button{font:inherit;background:var(--tile);color:var(--ink);border:1px solid var(--line2);border-radius:4px;padding:9px 14px;cursor:pointer}
+button.go{border-color:var(--kern);color:#cfe0ff}button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.st{font-size:12px;color:var(--dim)}.st b{color:var(--ink)}.ok{color:var(--ok)}.no{color:var(--drop)}.wait{color:var(--brass)}
+code{color:var(--teal)}footer{color:var(--mute);font-size:12px;display:flex;gap:16px;flex-wrap:wrap}
+label{display:grid;gap:6px;font-size:12px;color:var(--dim)}input{font:inherit;background:var(--tile);color:var(--ink);border:1px solid var(--line2);border-radius:4px;padding:8px 10px}
+</style></head><body><main>
+<div><div class="mark">W<em>OSP</em> · mint</div><p>Sacrificial worker on your glass. It seeds the Face's gate once, then it is spent.</p></div>
+<h1>Mint the operator <code>operator@smbos</code> (alias <code>admin</code>), root on the Face.</h1>
+<div class="card"><h2>0 · worker</h2><div class="st" id="w">probing…</div></div>
+<div class="card"><h2>1 · generate</h2>
+  <p>24 characters from a 76-symbol alphabet, drawn from <code>crypto.getRandomValues</code> on this machine. Shown once. Copy it into your manager before you mint.</p>
+  <div class="pw" id="pw">—</div>
+  <div class="row"><button id="gen">generate</button><button id="copy" disabled>copy</button><span class="st" id="gst"></span></div>
+</div>
+<div class="card"><h2>2 · mint</h2>
+  <p>Your browser derives PBKDF2-SHA-256 (100,000 rounds, 32-byte salt) and sends only the salt and the hash. The password itself never leaves this page.</p>
+  <label>username<input id="user" value="operator@smbos" readonly></label>
+  <div class="row"><button id="mint" class="go" disabled>mint operator@smbos</button><span class="st" id="mst"></span></div>
+</div>
+<div class="card"><h2>3 · after</h2><div class="st" id="after">Sign in at <code>https://<your-console-host>/login</code>, then burn this worker from <code>console/mint</code>: <code>wrangler delete --name wosp-mint --force</code>.</div></div>
+<footer><span>fabricated:false</span><span>root on the Face · the Kernel still disposes · A=LAG</span><span id="origin"></span></footer>
+</main>
+<script>
+const MINT_ORIGIN = /^https?:$/.test(location.protocol) ? "" : "__MINT_ORIGIN__";
+const $ = (id) => document.getElementById(id);
+$("origin").textContent = "mint at " + (MINT_ORIGIN || location.host);
+const ALPHA = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789-_.!@#%^*+=?";
+let password = "";
+function b64u(u){ let s=""; for(const b of u) s+=String.fromCharCode(b); return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+function gen(){
+  const out = []; const buf = new Uint8Array(64);
+  while (out.length < 24) { crypto.getRandomValues(buf); for (const b of buf) { if (b < 228 && out.length < 24) out.push(ALPHA[b % ALPHA.length]); } }  // 228 = 3*76: rejection sampling, no modulo bias
+  password = out.join(""); $("pw").textContent = password; $("copy").disabled = false; $("mint").disabled = state.minted || !state.bound; $("gst").textContent = "generated · shown once";
+}
+async function derive(pw){
+  const salt = crypto.getRandomValues(new Uint8Array(32));
+  const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(pw), "PBKDF2", false, ["deriveBits"]);
+  const bits = await crypto.subtle.deriveBits({ name:"PBKDF2", hash:"SHA-256", salt, iterations:100000 }, key, 256);
+  return { salt: b64u(salt), hash: b64u(new Uint8Array(bits)), iterations: 100000 };
+}
+const state = { bound:false, minted:false };
+async function probe(){
+  try{ const r = await fetch(MINT_ORIGIN + "/health", {cache:"no-store"}); const j = await r.json(); state.bound = !!j.bound; state.minted = !!j.minted;
+    $("w").innerHTML = j.minted ? `<span class="no">already minted</span> for <b>${j.user}</b> at ${j.minted_at} — this worker is spent. Burn it: <code>${j.burn}</code>` : (j.bound ? `<span class="ok">bound and unminted</span> — WOSP_AUTH is empty; one mint is open.` : `<span class="no">NO_SIGNAL</span> — WOSP_AUTH not bound`);
+  }catch(e){ $("w").innerHTML = `<span class="no">NO_SIGNAL</span> — ${e.message}`; }
+}
+$("gen").addEventListener("click", gen);
+$("copy").addEventListener("click", async () => { try { await navigator.clipboard.writeText(password); $("gst").textContent = "copied"; } catch(_) { $("gst").textContent = "select the box and copy by hand"; } });
+$("mint").addEventListener("click", async () => {
+  if (!password) return; $("mint").disabled = true; $("mst").innerHTML = '<span class="wait">deriving…</span>';
+  const d = await derive(password);
+  $("mst").innerHTML = '<span class="wait">minting…</span>';
+  try{
+    const r = await fetch(MINT_ORIGIN + "/mint", { method:"POST", headers:{ "content-type":"application/json" }, body: JSON.stringify({ username:"operator@smbos", role:"root", generated_on: location.host || "glass", ...d }) });
+    const j = await r.json();
+    if (r.status === 200 && j.minted) { $("mst").innerHTML = `<span class="ok">minted</span> ${j.user} at ${j.at}`; $("after").innerHTML = `Minted. Sign in at <a href="${j.login}" style="color:var(--teal)">${j.login}</a> with <b>operator@smbos</b> and the password above. Then burn this worker: <code>wrangler delete --name wosp-mint --force</code>.`; state.minted = true; }
+    else { $("mst").innerHTML = `<span class="no">refused ${r.status}</span> — ${j.reason || "?"}`; $("mint").disabled = false; }
+  }catch(e){ $("mst").innerHTML = `<span class="no">NO_SIGNAL</span> — ${e.message}`; $("mint").disabled = false; }
+});
+probe();
+</script></body></html>

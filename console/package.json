@@ -1,0 +1,12 @@
+{
+  "name": "wosp-console",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "WOSP Face door — static console + same-origin doors to the Control Pane and the Container IDE via service bindings. Proposes only.",
+  "scripts": {
+    "test": "node --test",
+    "parity": "python3 ../tools/console_parity.py",
+    "deploy": "wrangler deploy"
+  }
+}

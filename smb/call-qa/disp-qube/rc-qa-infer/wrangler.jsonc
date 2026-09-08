@@ -1,0 +1,14 @@
+{
+  // rc-qa-infer — disp-qube. Ephemeral inference: Whisper transcription + Llama rubric pass.
+  // Returns OBSERVATIONS only (four subscores, outcome, hostility flag, notes). Never decides,
+  // never touches D1, never texts, never sees a RingCentral credential. No hostname: reached
+  // only through rc-qa-gate's service binding. HO-RCQA-001 D3/D4/D5. fabricated:false
+  "name": "rc-qa-infer",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "ai": { "binding": "AI" }
+}

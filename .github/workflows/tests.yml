@@ -1,0 +1,23 @@
+name: tests
+on: [push, pull_request]
+jobs:
+  iceberg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash tools/iceberg_check.sh
+  node:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dir: [smb/call-qa/sys-net/rc-qa-ingress, smb/call-qa/sys-firewall/rc-qa-gate, smb/call-qa/disp-qube/rc-qa-infer, console]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: cd ${{ matrix.dir }} && (npm ci || npm i) && node --test
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: cd apex/contract && cargo test

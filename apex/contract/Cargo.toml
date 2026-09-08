@@ -1,0 +1,8 @@
+[package]
+name = "wosp-apex-contract"
+version = "0.1.0"
+edition = "2021"
+description = "The three instruments of the WOSP apex plane as types: Pin Chronometer, Silver Precision Dial, Toggle Switchboard. No dependencies; the math is the contract."
+
+[lib]
+path = "src/lib.rs"

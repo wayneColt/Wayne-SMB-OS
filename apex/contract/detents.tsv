@@ -1,0 +1,15 @@
+# d	confidence	budget_usd	write	detent	prod_write  — the worked points the panel, the Rust contract and the JS twin must all agree on. fabricated:false
+0	0.9900	0.00	false	MONITOR	false
+10	0.9510	3.15	false	MONITOR	false
+25	0.8925	16.42	false	MONITOR	false
+26	0.8886	17.62	false	SHADOW	false
+40	0.8340	38.25	false	SHADOW	false
+49	0.7989	55.12	false	SHADOW	false
+50	0.7950	57.16	true	SHADOW	false
+51	0.7911	59.24	true	ASSISTED	true
+65	0.7365	91.67	true	ASSISTED	true
+75	0.6975	118.60	true	ASSISTED	true
+76	0.6936	121.46	true	AUTONOMOUS	true
+90	0.6390	164.67	true	AUTONOMOUS	true
+99	0.6039	195.48	true	AUTONOMOUS	true
+100	0.6000	199.05	true	UNCHECKED	true

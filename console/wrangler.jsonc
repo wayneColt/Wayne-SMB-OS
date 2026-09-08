@@ -1,0 +1,52 @@
+{
+  "name": "smbos-console",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-30",
+  "workers_dev": true,
+  "preview_urls": false,
+
+  // A subdomain, not the root. the operator answered apex-controlpane "add a subdomain" on
+  // 2026-09-05 for the console; the control pane stays on workers.dev. WOSP is a
+  // WayneColt organ (NAME.md), so the hostname is WayneColt's. apex stays false.
+  // Rollback: remove this block, `wrangler deploy`, then delete the custom domain
+  // under the Worker's Domains & Routes.
+  "routes": [
+    { "pattern": "<your-console-host>", "custom_domain": true }
+  ],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+
+  // The Face is a static page. The asset layer serves it; the Worker only answers
+  // /health and the /v1 doors. public/_headers carries the page's response headers.
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "none",
+    // the gate must see every request before the asset layer answers it
+    "run_worker_first": true
+  },
+
+  // WOSP_AUTH — the gate's namespace: the operator record (operator@smbos, PBKDF2 salt+hash), the
+  // session-signing key and the minted marker, all written once by the sacrificial mint
+  // worker (mint/). Created 2026-09-05 (`wrangler kv namespace create WOSP_AUTH`). No agent
+  // writes a password here; the glass derives, the mint stores, this Worker only reads.
+  "kv_namespaces": [
+    { "binding": "WOSP_AUTH", "id": "<kv-namespace-id>" }
+  ],
+
+  // SERVICE BINDINGS ARE THE COMPOSITION PRIMITIVE (wayne_main/wrangler.jsonc, measured
+  // 2026-08-30): Worker-to-Worker fetches to public workers.dev hostnames do not route.
+  // These two bindings are the only doors the console opens. The names here must match
+  // UPSTREAM in src/index.js — tools/console_parity.py checks that they do.
+  // STATE is the DwEC's Recorded letter: wayne-main-state is a Durable Object per workspace
+  // whose every PUT is logged, append-only (verified 2026-09-05: PUT /state/:ws returns a
+  // digest and /log/:ws carries the trail). Workspace: wosp-dwec.
+  "services": [
+    { "binding": "CONTROL_PANE", "service": "<your-control-pane-worker>" },
+    { "binding": "DEV_IDE",      "service": "<your-container-sandbox-worker>" },
+    { "binding": "STATE",        "service": "<your-state-worker>" },
+    // SMBOS: the Store A call-QA ladder, read-only (health + stats). Never the admin routes.
+    { "binding": "RCQA",         "service": "rc-qa-gate" },
+    // the `chat` surface circuit's health card (read-only /health); the lamp reads it only while chat is ON
+    { "binding": "EPIDERMIS",    "service": "<your-epidermis-worker>" }
+  ]
+}

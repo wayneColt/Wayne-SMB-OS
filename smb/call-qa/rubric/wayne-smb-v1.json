@@ -1,0 +1,24 @@
+{
+  "rubric_version": "wayne-smb-v1",
+  "authority": "Wayne INTERNAL, domain-wide — the four-category coaching rubric for the Wayne-SMB OS Platform (any shop, any location). Not the client's wording; the client's KPI logic lives in client-rubric-example.json and both ride every grade.",
+  "scale": "1-5 per category; total 4-20 computed in code",
+  "categories": {
+    "greeting_score": "stated the shop name, polite and branded introduction",
+    "discovery_score": "asked clarifying questions, understood the customer's actual issue",
+    "action_score": "attempted to book an appointment or recommend a relevant service",
+    "empathy_score": "professional, patient, non-defensive tone throughout"
+  },
+  "observations": {
+    "hostility_flag": "true if the customer became hostile, threatened a negative review, or demanded a manager",
+    "call_outcome": [
+      "booked",
+      "inquiry",
+      "complaint",
+      "lost_lead"
+    ],
+    "coaching_note": "one specific, actionable instruction naming what the rep should have said or done"
+  },
+  "policy_lives_in": "sys-firewall/rc-qa-gate/src/policy.js — the model never decides an alert",
+  "fabricated": false,
+  "scope": "Wayne-SMB OS Platform · domain-wide · pairs with a client rubric per launch"
+}

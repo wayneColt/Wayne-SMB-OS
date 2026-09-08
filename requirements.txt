@@ -1,0 +1,40 @@
+# WOSP — WayneOSPlatform (wasp). NOT pip.
+# 2026-08-28 · fabricated:false · `-b`
+#
+# Runtime to RUN the loop (stdlib):
+#   python3 >= 3.11   (this nest: 3.13)
+#
+# Container IDE (LIVE GET 2026-08-28):
+#   wayne-cdn-container-sandbox
+#   image docker.io/cloudflare/sandbox:0.12.7-python
+#   enableInternet:false   — loop is self-contained; no pip, no git inside
+#   max_instances:1
+#   exec timeout required
+#
+# Face (LIVE GET 2026-08-28):
+#   wayne-aios-control-pane  kernel_accept:false  apex:false
+# Operator's Face (LIVE GET 2026-09-05) — console/:
+#   wosp-console  https://<your-console-host>  (+ workers.dev)  six same-origin doors
+#   via service bindings; proposes only; guards: node --test · tools/console_parity.py
+#
+# KERNEL EXCLUDED. aios_k0 is not a WOSP organ. Do not cite this file as a
+# rebuild-hold, a deploy-hold, or a CI-hold on the kernel. Those holds live
+# in the estate lanes, not here. "Per WOSP v1" has no kernel referent.
+#
+# Hands (AMENDED 2026-09-05, the operator: "OpenCode arrives via nix, when a hand needs it"):
+#   A finished WOSP has one hand per application (SOTR §4): ClaudeCode for TanOak and
+#   KSSP, GrokBuild for Verdict, container exec for TanOak and Verdict. GrokBuild's CF
+#   activation path is OpenCode. Requirement, stated against the finished platform and
+#   not against every version: OpenCode is REQUIRED the moment the GrokBuild hand is
+#   activated for a Verdict work item, and not before. It arrives as a nix package
+#   (configuration.nix overlay or a nix profile), never the install script.
+#   Still: do not npm -g. Do not apt. The v1 line below is retained struck, not erased:
+#   ~~Do not install OpenCode (this seat's CF activation is Grok TUI + Claude-compat,
+#   not the OpenCode path).~~ Do not npm -g. Do not apt.
+# Operator gesture (not pip, not a third queue):
+#   ~/Desktop/DECISIONS/     Thunar · two buckets · STATE · not in this git
+#   keystroke/decision_queue.py   mutating organ
+#   wosp/gesture.py --status      read-only Platform view
+# Provenance: SADDLE Pane#8 ∩ canon HITL. See GESTURE.md.
+#
+# Full nest compile: ../1_wayne_model/requirements.txt
