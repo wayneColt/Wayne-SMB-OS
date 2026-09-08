@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        dir: [smb/call-qa/sys-net/rc-qa-ingress, smb/call-qa/sys-firewall/rc-qa-gate, smb/call-qa/disp-qube/rc-qa-infer, console]
+        dir: [smb/call-qa/sys-net/rc-qa-ingress, smb/call-qa/sys-firewall/rc-qa-gate, smb/call-qa/disp-qube/rc-qa-infer, smb/identity, console]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
