@@ -11,3 +11,5 @@ Order of operations:
 6. Report `NO_SIGNAL` wherever a value is absent; never estimate revenue — it comes only from a real Value column.
 
 Guard: `tools/iceberg_check.sh` must print `0` before any push. It fails on client, store, person, domain and account identifiers that do not belong in a public tree.
+
+The human supplies judgment; this platform supplies follow-through. Do not add documents to prove the pairing — output is what leaves, with a receipt. Falsification: 3 external bites (reply, request, meeting, offer, or hard no from a stranger) by 2026-10-10.
