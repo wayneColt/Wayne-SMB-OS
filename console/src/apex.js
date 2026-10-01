@@ -15,7 +15,7 @@ export const DETENT_RANK = Object.freeze({ MONITOR: 0, SHADOW: 1, ASSISTED: 2, A
 export const RING_MINUTES = 24 * 60, PIN_STEP = 15, PIN_COUNT = RING_MINUTES / PIN_STEP, MIN_EPOCH = 5, DEFAULT_EPOCH = 240;
 export const STANDARD_CIRCUITS = Object.freeze([
   ["gmail", false], ["github", false], ["cdn", false], ["r2", false], ["d1", false],
-  ["ringcentral", false], ["workers_ai", true], ["babel", true], ["write_ops", true], ["prod", true],
+  ["ringcentral", false], ["workers_ai", true], ["polyglot", true], ["write_ops", true], ["prod", true],
   // Wayne.com surfaces (inventory 2026-09-06): each exposes or executes, so each is flip-covered.
   // Declared OFF; arming one is a wetware act. `comms` reaches the LAN through the pre-existing ucc tunnel.
   ["comms", true], ["shell", true], ["container", true], ["chat", true], ["canvas", true], ["task", true],
