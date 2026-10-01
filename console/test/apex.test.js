@@ -98,3 +98,9 @@ test("Wayne.com surface circuits: present, OFF, guarded; a board saved before th
   assert.equal(allows(armed, "shell"), true);
   assert.deepEqual(mayWrite(dial(90), armed, "mock"), { stop: "DARK_CIRCUIT", circuit: "write_ops" });
 });
+
+test("roster: the multi-model inference routing circuit is `polyglot`, guarded, OFF by default (renamed 2026-10-01)", () => {
+  const c = switchboard(null).circuits.find((x) => x.id === "polyglot");
+  assert.ok(c, "polyglot missing from the standard roster"); assert.equal(c.guarded, true); assert.equal(c.toggle, "OFF");
+  assert.equal(STANDARD_CIRCUITS.length, 16);
+});

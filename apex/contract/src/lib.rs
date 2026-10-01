@@ -128,7 +128,7 @@ pub struct Switchboard { pub circuits: Vec<Circuit> }
 
 pub const STANDARD_CIRCUITS: [(&str, bool); 16] = [
     ("gmail", false), ("github", false), ("cdn", false), ("r2", false), ("d1", false),
-    ("ringcentral", false), ("workers_ai", true), ("babel", true), ("write_ops", true), ("prod", true),
+    ("ringcentral", false), ("workers_ai", true), ("polyglot", true), ("write_ops", true), ("prod", true),
     // Wayne.com surfaces (inventory 2026-09-06): each exposes or executes, so each carries a
     // flip-cover. Declared OFF; arming one is a wetware act. `comms` is the one circuit that
     // reaches the LAN (the pre-existing ucc tunnel) and must say so wherever it is rendered.
